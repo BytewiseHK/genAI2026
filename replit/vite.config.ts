@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
-import { getReplitPlugins } from "./replit/vite-plugins";
+import { getReplitPlugins } from "./vite-plugins";
 
 export default defineConfig(async () => ({
   plugins: [react(), ...(await getReplitPlugins())],

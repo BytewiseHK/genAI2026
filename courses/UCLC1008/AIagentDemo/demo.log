@@ -1,0 +1,15 @@
+[2025-02-03] Task started: extractFilterRef.md
+- Read context.md: Quiz on 27 Feb, topic "The impact of AI chatbots and companion apps on humans"
+- Excerpts from Ho et al. (2025) reference section
+- Ho2025.md is large (~240k chars), searching for reference section
+- References section starts at line 354; Table 1 lists 23 included records (marked with *)
+
+[2025-02-03] Reference extraction
+- Confirmed 105 references in Ho et al. (2025)
+- Identified 23 included studies (marked with asterisk): Alabed 2024, Chaturvedi 2024, Ciriello 2024, Depounti 2023, Dewitte 2024, Gao 2018, Hernandez-Ortega 2021, Jecker 2024, Laestadius 2022, Li & Zhang 2024, Liberati 2023, Pal 2023, Pan 2023, Pettman 2017, Prochazka 2024, Ragab 2024, Root 2024, Siemon 2022, Skjuve 2021, Skjuve 2023, Wygnańska 2023, Xie & Pentina 2022, Xie 2023
+
+[2025-02-03] focusReading.md created
+- Top 5: Skjuve 2021, Xie & Pentina 2022, Xie 2023, Li & Zhang 2024, Laestadius 2022
+- Criteria: citation frequency, direct impact focus, Discussion-style content
+- 15 more articles listed (items 6–20)
+- Task complete
