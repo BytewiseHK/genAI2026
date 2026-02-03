@@ -87,3 +87,11 @@
   - detailedplan02.md: sentence-by-sentence guide with citation formats
 - All docs include explanations for student guidance
 - Task complete
+
+[2026-02-03] Task: Create detailedPlan03 without sample sentences
+- Created detailedPlan03.md for teacherJumpIntoWater (Sample AWQ - FRT)
+- Created detailedPlan03.md for MockPractice/JumpWaterAgain (Practice 1 - AI chatbots)
+- Removed all "Example sentence frame" sections
+- Kept: excerpts to paraphrase, paraphrase direction, citation guidance
+- Students must write their own sentences without templates
+- Task complete
