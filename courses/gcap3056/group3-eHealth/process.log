@@ -1,0 +1,13 @@
+# Group 3 — process log
+
+## Project switch: Government Vacancies → eHealth
+
+- **Archived:** Previous project (Government Vacancies app) moved to `archive-government-vacancies/`. Contents: `public-info.md`, `openDataAccess.md`, `prelimReport.md`, `planNextSteps.md`. See `archive-government-vacancies/README.md`.
+- **Moved in:** eHealth content from `courses/gcap3056/groupX eHealth/`: `idea.md`, `planNextSteps.md` (adapted for Group 3), `mergeGroup3-instructions.md`. Project renamed and presented as **eHealth** in this folder.
+- **Created:** `public-info.md` for eHealth (overview, focus areas, next steps); `process.log` (this file).
+- **Folder renamed:** `group3-government-app` → `group3-eHealth`. **groupX eHealth** folder deleted (all content now in this folder).
+
+## Next (for the team)
+
+- Curate public info (eHealth policy, insurance reimbursement, technical infrastructure, SCMP letters on eHealth / Simon Wang).
+- Choose a focus and create `searchPlan.md`, then AI web search and report, hypotheses, questions for government. See `planNextSteps.md`.

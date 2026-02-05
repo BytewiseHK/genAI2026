@@ -1,6 +1,6 @@
 # Plan: next steps towards progress (like group6-rare-disease)
 
-**Project:** Group X — eHealth (exploring how eHealth may facilitate automation of insurance reimbursement for medical bills; focus on technical infrastructure; include search for SCMP letters on eHealth including some by Simon Wang).  
+**Project:** Group 3 — eHealth (exploring how eHealth may facilitate automation of insurance reimbursement for medical bills; focus on technical infrastructure; include search for SCMP letters on eHealth including some by Simon Wang).  
 **Reference:** More work has been done for `courses/gcap3056/group6-rare-disease`; see that folder’s `process.log` and files (searchPlan, AIwebsearch/AIsearchReport, hypotheses, HypotheseQuestions, etc.).
 
 ---
