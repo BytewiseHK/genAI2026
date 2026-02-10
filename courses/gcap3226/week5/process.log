@@ -1,0 +1,214 @@
+# Process Log for Week 5 Tasks
+## Date: February 10, 2026
+
+---
+
+### Task 1: Fetch Workshop Content
+**Status:** Completed
+**Time:** Started processing
+
+- Attempted to fetch content from https://eapteacher.smartutor.me/workshops/math-19dec#act
+- The page is a React Single Page Application (SPA) - content is loaded dynamically via JavaScript
+- Retrieved meta information: "AI Learning Hub for EAP" by Dr. Simon Wang
+- Description: Interactive course teaching educators how to create effective AI prompts for educational content generation
+
+### Task 2: Create agentDemo.html  
+**Status:** Completed ✅
+
+- Found reference image: courses/gcap3226/week5/image/goals/Configure_Tools.png
+- Created comprehensive demo page explaining:
+  - Input-Process-Output model with visual boxes
+  - AI agent tools (Web Search, File Operations, Code Execution, etc.)
+  - Key concepts: Autonomous Action, Tool Calling, Context Awareness
+  - Interactive demo simulation
+- Includes link to workshop: https://eapteacher.smartutor.me/workshops/math-19dec#act
+
+### Task 3: Review essay1Prompt.md
+**Status:** Completed ✅
+
+- Read essay1Prompt.md - contains system prompt for reflective essay tutor
+- Key requirements for students:
+  - Write 200-word reflective essay about regression and simulation models
+  - Connect course concepts to group project work
+  - Demonstrate personal insights and behavioral changes
+  - Use guided reflection approach with one question at a time
+
+### Task 4: Create Essay Drafting Chatbot
+**Status:** Completed ✅
+
+- Created chatbots/chatbot.html with dual-mode interface:
+  - **Essay Mode**: Guided reflective essay writing with AI tutor
+  - **Topic Explorer Mode**: Topic exploration with web search simulation
+- Features:
+  - Interactive chat interface
+  - Essay text editor with word count (targets 200 words)
+  - HTML generation for Moodle posting
+  - Chat history export
+  - Auto-save to localStorage
+- Created supporting files:
+  - chatbots/essay1.md - Essay draft template
+  - chatbots/exploreTopics.md - Topic exploration notes
+
+### Task 5: Topic Exploration Feature
+**Status:** Completed ✅
+
+- Integrated into chatbot.html with mode toggle
+- Topic Explorer mode includes:
+  - Web search simulation
+  - Topic notes area
+  - Chat history export to exploreTopics.md
+  - Real-time updates to localStorage
+
+---
+
+## Summary of Completed Work
+
+1. ✅ Fetched workshop content (React SPA, meta info extracted)
+2. ✅ Created agentDemo.html with:
+   - Input-Process-Output model visualization
+   - AI agent tools explanation
+   - Interactive demo simulation
+   - Reference to Configure_Tools.png image
+3. ✅ Reviewed essay1Prompt.md requirements
+4. ✅ Created chatbot.html with essay drafting and topic exploration
+5. ✅ Created essay1.md and exploreTopics.md templates
+6. ✅ **Updated chatbot.html with real AI connectivity:**
+   - Auto-connects to local AI servers (Ollama, LM Studio, LocalAI)
+   - Falls back to manual copy-paste mode with GitHub Copilot
+   - Shows connection status in bottom-right corner
+   - Popup modal for copy-paste workflow in manual mode
+   - Proper chat history persistence
+
+---
+
+## Files Created/Updated
+
+- courses/gcap3226/week5/agentDemo.html (created)
+- courses/gcap3226/week5/chatbots/chatbot.html (created & updated)
+- courses/gcap3226/week5/chatbots/essay1.md (created)
+- courses/gcap3226/week5/chatbots/exploreTopics.md (created)
+- courses/gcap3226/week5/process.log (updated throughout)
+
+---
+
+## How to Use the Chatbot
+
+### Option 1: With Local AI (Ollama) ✅ CONFIGURED
+```bash
+# Install Ollama
+curl -fsSL https://ollama.com/install.sh | sh
+# Pull a model
+ollama pull llama3.2:1b
+# Start Ollama server
+ollama serve
+```
+Then open chatbot.html - it will auto-connect.
+
+### Option 2: Manual Mode (GitHub Copilot)
+1. Open chatbot.html in browser
+2. Type your message and press Enter
+3. A popup appears with the full prompt
+4. Copy the prompt to GitHub Copilot in VS Code
+5. Paste the AI's response back into the popup
+6. Click "Submit Response" to continue
+
+---
+
+## Ollama Setup Log (February 10, 2026)
+
+### Installation
+- Installed Ollama via: `curl -fsSL https://ollama.com/install.sh | sh`
+- Installed to: /usr/local
+- API available at: 127.0.0.1:11434
+
+### Model Downloaded
+- **llama3.2:1b** (1.3 GB) - lightweight model for fast responses
+- Verified working with test query
+
+### Test Result
+```json
+{"model":"llama3.2:1b","message":{"role":"assistant","content":"Hello, it's nice to meet you."}}
+```
+
+### Chatbot Configuration
+- Updated chatbot.html to use model: `llama3.2:1b`
+- Connection status indicator shows "✅ Connected to Ollama" when working
+
+---
+
+## GitHub Codespace Configuration
+
+### Port Forwarding for Ollama
+- Port 11434 must be forwarded and made **public** in Codespace
+- Chatbot auto-detects Codespace environment and constructs proper URL
+- Format: `https://{codespace-name}-11434.app.github.dev`
+
+### CORS Configuration
+```bash
+OLLAMA_ORIGINS="*" ollama serve
+```
+
+---
+
+## Markdown Rendering (Added)
+
+### Features
+- Added marked.js library for markdown parsing
+- Assistant responses now render:
+  - **Bold** and *italic* text
+  - `inline code` and code blocks
+  - Headers (h1, h2, h3)
+  - Lists (bulleted and numbered)
+  - Blockquotes
+  - Links
+- Fallback simple markdown parser if CDN fails
+
+---
+
+## New Skill Learned: Deploying Open Source Small Language Models
+
+### Key Steps
+1. **Install Ollama** - Open source LLM runtime
+   ```bash
+   curl -fsSL https://ollama.com/install.sh | sh
+   ```
+
+2. **Pull a model** - Download open source models
+   ```bash
+   ollama pull llama3.2:1b    # 1.3GB lightweight
+   ollama pull llama3.2       # 2GB standard
+   ollama pull mistral        # 4GB more capable
+   ```
+
+3. **Start server with CORS**
+   ```bash
+   OLLAMA_ORIGINS="*" ollama serve
+   ```
+
+4. **API Usage**
+   ```bash
+   curl http://localhost:11434/api/chat -d '{
+     "model": "llama3.2:1b",
+     "messages": [{"role": "user", "content": "Hello"}],
+     "stream": false
+   }'
+   ```
+
+### Benefits
+- **Privacy**: Data stays local, no API keys needed
+- **Cost**: Free to run, no per-token charges
+- **Speed**: Low latency for small models
+- **Offline**: Works without internet after model download
+- **Customizable**: Can fine-tune or use custom models
+
+### Available Models (via Ollama)
+| Model | Size | Use Case |
+|-------|------|----------|
+| llama3.2:1b | 1.3GB | Fast, lightweight |
+| llama3.2 | 2GB | Balanced |
+| mistral | 4GB | More capable |
+| codellama | 4GB | Code generation |
+| phi3 | 2GB | Microsoft's small model |
+
+---
+

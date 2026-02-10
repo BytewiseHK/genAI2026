@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Essay Writing Assistant - GCAP3226</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: rgba(255,255,255,0.1);
+            padding: 15px 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 1.5em;
+        }
+        .mode-toggle {
+            display: flex;
+            gap: 10px;
+        }
+        .mode-btn {
+            padding: 8px 20px;
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .mode-btn.active {
+            background: white;
+            color: #667eea;
+        }
+        .mode-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .main-container {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* Chat Section */
+        .chat-section {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .chat-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chat-header .icon {
+            font-size: 1.5em;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+        .message.assistant .message-avatar {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+        }
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 15px;
+            line-height: 1.5;
+        }
+        .message.assistant .message-content {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 5px;
+        }
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .chat-input-area {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .send-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Essay Section */
+        .essay-section {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .essay-header {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .essay-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .word-count {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+        .essay-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .essay-textarea {
+            width: 100%;
+            height: 100%;
+            min-height: 300px;
+            border: none;
+            font-size: 1.1em;
+            line-height: 1.8;
+            resize: none;
+            outline: none;
+            font-family: 'Georgia', serif;
+        }
+        .essay-actions {
+            padding: 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+        .action-btn.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .action-btn.secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Topic Explorer Mode */
+        .topic-mode {
+            display: none;
+        }
+        .topic-mode.active {
+            display: flex;
+        }
+        .essay-mode {
+            display: flex;
+        }
+        .essay-mode.hidden {
+            display: none;
+        }
+        
+        /* Search Results */
+        .search-results {
+            background: #f0f7ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        .search-result-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .search-result-item h4 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        .search-result-item p {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        /* Instructions Panel */
+        .instructions {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .instructions h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        .instructions ul {
+            color: #856404;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin-bottom: 5px;
+        }
+        
+        /* Typing animation */
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+        .typing-dot {
+            color: #667eea;
+        }
+        
+        /* Modal styles */
+        .modal textarea {
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        
+        /* Hidden file content for IDE access */
+        #essay-markdown-content {
+            display: none;
+        }
+        
+        /* Markdown styles for chat messages */
+        .message-content h1, .message-content h2, .message-content h3 {
+            margin: 10px 0 5px 0;
+            color: #333;
+        }
+        .message-content h1 { font-size: 1.3em; }
+        .message-content h2 { font-size: 1.2em; }
+        .message-content h3 { font-size: 1.1em; }
+        .message-content p {
+            margin: 8px 0;
+        }
+        .message-content ul, .message-content ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        .message-content li {
+            margin: 4px 0;
+        }
+        .message-content code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+        .message-content pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .message-content pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        .message-content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 12px;
+            margin: 10px 0;
+            color: #666;
+            font-style: italic;
+        }
+        .message-content strong {
+            font-weight: 600;
+        }
+        .message-content em {
+            font-style: italic;
+        }
+        .message-content a {
+            color: #667eea;
+            text-decoration: underline;
+        }
+        .message.user .message-content code {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+    </style>
+    <!-- Markdown parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>🤖 GCAP3226 AI Assistant</h1>
+        <div class="mode-toggle">
+            <button class="mode-btn active" onclick="switchMode('essay')">✍️ Essay Mode</button>
+            <button class="mode-btn" onclick="switchMode('topic')">🔍 Topic Explorer</button>
+        </div>
+    </div>
+    
+    <div class="main-container essay-mode" id="essayModeContainer">
+        <!-- Chat Section -->
+        <div class="chat-section">
+            <div class="chat-header">
+                <span class="icon">🎓</span>
+                <div>
+                    <strong>Reflective Essay Tutor</strong>
+                    <div style="font-size: 0.8em; opacity: 0.8;">Helping you write about regression & simulation models</div>
+                </div>
+            </div>
+            <div class="chat-messages" id="essayChatMessages">
+                <div class="instructions">
+                    <h3>📝 How to Use This Chatbot</h3>
+                    <ul>
+                        <li><strong>Auto-connect:</strong> Tries to connect to local AI (Ollama, LM Studio, LocalAI)</li>
+                        <li><strong>Manual mode:</strong> If no local AI, a popup lets you copy prompts to your IDE's AI</li>
+                        <li>Paste the AI's response back into the popup to continue the conversation</li>
+                        <li>Type <strong>"ok"</strong> to start the guided reflection process</li>
+                    </ul>
+                </div>
+                <div class="message assistant">
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-content">
+                        Welcome! I'm here to help you write your reflective essay about regression and simulation models. 
+                        <br><br>
+                        Before we start, please review your course notes from the past 5 weeks. When you're ready, type <strong>"ok"</strong> and I'll guide you through the reflection process step by step.
+                        <br><br>
+                        Remember: We're aiming for a thoughtful 200-word essay that connects your learning to your group project work.
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="essayChatInput" placeholder="Type 'ok' to start or ask a question...">
+                <button class="send-btn" onclick="sendEssayMessage()">➤</button>
+            </div>
+        </div>
+        
+        <!-- Essay Section -->
+        <div class="essay-section">
+            <div class="essay-header">
+                <h2><span>📄</span> My Reflective Essay</h2>
+                <div class="word-count" id="wordCount">0 / 200 words</div>
+            </div>
+            <div class="essay-content">
+                <textarea class="essay-textarea" id="essayTextarea" placeholder="Start writing your reflective essay here...
+
+Your essay should include:
+• Your understanding of regression and simulation models
+• How these connect to your group project
+• Personal insights and 'aha' moments
+• How your thinking has changed"></textarea>
+            </div>
+            <div class="essay-actions">
+                <button class="action-btn primary" onclick="saveEssay()">💾 Save Essay</button>
+                <button class="action-btn secondary" onclick="copyEssay()">📋 Copy to Clipboard</button>
+                <button class="action-btn secondary" onclick="generateHTML()">🌐 Generate HTML for Moodle</button>
+                <button class="action-btn secondary" onclick="exportChat()">📥 Export Chat History</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Topic Explorer Mode -->
+    <div class="main-container topic-mode" id="topicModeContainer">
+        <div class="chat-section" style="flex: 2;">
+            <div class="chat-header" style="background: linear-gradient(135deg, #fc4a1a, #f7b733);">
+                <span class="icon">🔍</span>
+                <div>
+                    <strong>Topic Explorer</strong>
+                    <div style="font-size: 0.8em; opacity: 0.8;">Explore topics and perform web searches</div>
+                </div>
+            </div>
+            <div class="chat-messages" id="topicChatMessages">
+                <div class="instructions">
+                    <h3>🔍 Topic Explorer Instructions</h3>
+                    <ul>
+                        <li>Use this to explore different project topics</li>
+                        <li>Ask your IDE's AI agent to perform web searches</li>
+                        <li>Chat history is saved to <code>exploreTopics.md</code></li>
+                        <li>Discuss ideas for your group project</li>
+                    </ul>
+                </div>
+                <div class="message assistant">
+                    <div class="message-avatar">🔍</div>
+                    <div class="message-content">
+                        Hello! I'm here to help you explore different topics for your group project.
+                        <br><br>
+                        You can ask me to:
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>Search for information about potential topics</li>
+                            <li>Compare different project ideas</li>
+                            <li>Find resources and references</li>
+                            <li>Discuss how topics relate to course concepts</li>
+                        </ul>
+                        <br>
+                        What topic would you like to explore?
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="topicChatInput" placeholder="Enter a topic to explore or ask a question...">
+                <button class="send-btn" onclick="sendTopicMessage()" style="background: linear-gradient(135deg, #fc4a1a, #f7b733);">➤</button>
+            </div>
+        </div>
+        
+        <div class="essay-section" style="flex: 1;">
+            <div class="essay-header" style="background: linear-gradient(135deg, #fc4a1a, #f7b733);">
+                <h2><span>📋</span> Topic Notes</h2>
+            </div>
+            <div class="essay-content">
+                <textarea class="essay-textarea" id="topicNotes" placeholder="Take notes about topics you're exploring...
+
+Ideas for group project:
+• 
+• 
+• 
+
+Interesting findings:
+• 
+• "></textarea>
+            </div>
+            <div class="essay-actions">
+                <button class="action-btn primary" onclick="saveTopicNotes()" style="background: linear-gradient(135deg, #fc4a1a, #f7b733);">💾 Save Notes</button>
+                <button class="action-btn secondary" onclick="exportTopicChat()">📥 Export Chat</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden storage for markdown content -->
+    <div id="essay-markdown-content"></div>
+    
+    <!-- AI Response Modal -->
+    <div id="aiModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center;">
+        <div style="background:white; border-radius:15px; padding:30px; max-width:800px; width:90%; max-height:80vh; overflow-y:auto;">
+            <h3 style="margin-bottom:15px; color:#667eea;">📋 Copy this prompt to your AI agent:</h3>
+            <textarea id="promptToCopy" style="width:100%; height:200px; padding:15px; border:2px solid #ddd; border-radius:8px; font-family:monospace; font-size:0.9em; margin-bottom:15px;" readonly></textarea>
+            <button onclick="copyPromptToClipboard()" style="background:#667eea; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; margin-right:10px;">📋 Copy Prompt</button>
+            <hr style="margin:20px 0;">
+            <h3 style="margin-bottom:15px; color:#11998e;">✍️ Paste the AI response here:</h3>
+            <textarea id="aiResponseInput" style="width:100%; height:150px; padding:15px; border:2px solid #ddd; border-radius:8px; font-size:1em; margin-bottom:15px;" placeholder="Paste the AI's response here..."></textarea>
+            <div style="display:flex; gap:10px;">
+                <button onclick="submitAIResponse()" style="background:#11998e; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">✓ Submit Response</button>
+                <button onclick="closeModal()" style="background:#e0e0e0; color:#333; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">✕ Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Connection Status -->
+    <div id="connectionStatus" style="position:fixed; bottom:20px; right:20px; padding:10px 15px; border-radius:20px; font-size:0.8em; z-index:100;"></div>
+    
+    <script>
+        // Chat history storage
+        let essayChatHistory = [];
+        let topicChatHistory = [];
+        let currentMode = 'essay';
+        let aiConnected = false;
+        let ollamaModel = 'llama3.2:1b';
+        
+        // Detect GitHub Codespace and build proper URLs
+        function getOllamaUrl() {
+            // Check if running in GitHub Codespace
+            const hostname = window.location.hostname;
+            if (hostname.includes('.app.github.dev')) {
+                // Extract codespace name from current URL (format: codespace-name-port.app.github.dev)
+                const match = hostname.match(/^(.+)-\d+\.app\.github\.dev$/);
+                if (match) {
+                    const codespaceName = match[1];
+                    return `https://${codespaceName}-11434.app.github.dev/api/chat`;
+                }
+                // Alternative: construct from hostname by replacing port
+                const baseCodespace = hostname.replace(/-\d+\.app\.github\.dev$/, '');
+                return `https://${baseCodespace}-11434.app.github.dev/api/chat`;
+            }
+            // Local development
+            return 'http://localhost:11434/api/chat';
+        }
+        
+        // AI endpoints to try - dynamically constructed
+        function getAIEndpoints() {
+            const ollamaUrl = getOllamaUrl();
+            return [
+                { name: 'Ollama', url: ollamaUrl, type: 'ollama' },
+                { name: 'Ollama Local', url: 'http://localhost:11434/api/chat', type: 'ollama' },
+                { name: 'LM Studio', url: 'http://localhost:1234/v1/chat/completions', type: 'openai' },
+                { name: 'LocalAI', url: 'http://localhost:8080/v1/chat/completions', type: 'openai' }
+            ];
+        }
+        
+        let activeEndpoint = null;
+        
+        // System prompts
+        const essaySystemPrompt = `You are supporting students in GCAP3226 who need to write a 200-word reflective essay about regression and simulation models from the course and how they connect to their group project work.
+
+Your role is a supportive and encouraging writing tutor. Be friendly, patient, and focused on helping students develop their thinking. Guide students through meaningful reflection without providing grades.
+
+Help students write a 200-word essay demonstrating:
+1. Understanding of regression and simulation models
+2. Connection between these models and their group project work
+3. Personal insights and learning moments
+4. Critical thinking about real-world applications
+
+Ask one thoughtful question at a time and wait for responses. When they type "ok", start with: "Let's start by reflecting on what you've learned about regression and simulation models in our course. What's your understanding of these two different modeling approaches?"
+
+Keep responses concise (2-3 paragraphs max). Be encouraging and help the student develop their ideas.`;
+
+        const topicSystemPrompt = `You are a helpful research assistant helping students explore potential project topics for GCAP3226. Help them:
+1. Explore different topic ideas related to data analysis
+2. Understand how regression and simulation models could apply
+3. Find relevant resources and references
+4. Think critically about project feasibility
+
+When students ask to search for something, provide helpful information and suggestions. Keep responses practical and actionable.`;
+
+        // Check for available AI endpoints on load
+        async function checkAIConnections() {
+            const status = document.getElementById('connectionStatus');
+            status.innerHTML = '🔄 Checking AI connections...';
+            status.style.background = '#fff3cd';
+            status.style.color = '#856404';
+            
+            const AI_ENDPOINTS = getAIEndpoints();
+            console.log('Trying endpoints:', AI_ENDPOINTS.map(e => e.url));
+            
+            for (const endpoint of AI_ENDPOINTS) {
+                try {
+                    const testUrl = endpoint.url.replace('/chat', '/tags').replace('/chat/completions', '/models');
+                    console.log('Testing:', testUrl);
+                    const testResponse = await fetch(testUrl, {
+                        method: 'GET',
+                        signal: AbortSignal.timeout(3000)
+                    });
+                    if (testResponse.ok) {
+                        activeEndpoint = endpoint;
+                        aiConnected = true;
+                        status.innerHTML = `✅ Connected to ${endpoint.name}`;
+                        status.style.background = '#d4edda';
+                        status.style.color = '#155724';
+                        console.log('Connected to:', endpoint.name, endpoint.url);
+                        return;
+                    }
+                } catch (e) {
+                    console.log(`${endpoint.name} not available:`, e.message);
+                }
+            }
+            
+            // No AI found - use manual mode
+            status.innerHTML = '📋 Manual Mode (Copy-Paste)';
+            status.style.background = '#cce5ff';
+            status.style.color = '#004085';
+            aiConnected = false;
+        }
+        
+        // Call AI endpoint
+        async function callAI(messages, systemPrompt) {
+            if (!activeEndpoint) {
+                return null;
+            }
+            
+            const fullMessages = [
+                { role: 'system', content: systemPrompt },
+                ...messages
+            ];
+            
+            try {
+                let response;
+                if (activeEndpoint.type === 'ollama') {
+                    response = await fetch(activeEndpoint.url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            model: ollamaModel,
+                            messages: fullMessages,
+                            stream: false
+                        })
+                    });
+                    const data = await response.json();
+                    return data.message?.content || data.response;
+                } else {
+                    response = await fetch(activeEndpoint.url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            model: 'gpt-3.5-turbo',
+                            messages: fullMessages
+                        })
+                    });
+                    const data = await response.json();
+                    return data.choices?.[0]?.message?.content;
+                }
+            } catch (e) {
+                console.error('AI call failed:', e);
+                return null;
+            }
+        }
+        
+        // Mode switching
+        function switchMode(mode) {
+            currentMode = mode;
+            const essayContainer = document.getElementById('essayModeContainer');
+            const topicContainer = document.getElementById('topicModeContainer');
+            const buttons = document.querySelectorAll('.mode-btn');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            if (mode === 'essay') {
+                essayContainer.classList.remove('hidden');
+                essayContainer.classList.add('essay-mode');
+                topicContainer.classList.remove('active');
+                buttons[0].classList.add('active');
+            } else {
+                essayContainer.classList.add('hidden');
+                essayContainer.classList.remove('essay-mode');
+                topicContainer.classList.add('active');
+                buttons[1].classList.add('active');
+            }
+        }
+        
+        // Modal functions
+        function showModal(prompt) {
+            document.getElementById('promptToCopy').value = prompt;
+            document.getElementById('aiResponseInput').value = '';
+            document.getElementById('aiModal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.getElementById('aiModal').style.display = 'none';
+        }
+        
+        function copyPromptToClipboard() {
+            const prompt = document.getElementById('promptToCopy').value;
+            navigator.clipboard.writeText(prompt);
+            alert('Prompt copied! Paste it into your AI agent (GitHub Copilot, ChatGPT, etc.)');
+        }
+        
+        function submitAIResponse() {
+            const response = document.getElementById('aiResponseInput').value.trim();
+            if (!response) {
+                alert('Please paste the AI response first.');
+                return;
+            }
+            
+            const containerId = currentMode === 'essay' ? 'essayChatMessages' : 'topicChatMessages';
+            const history = currentMode === 'essay' ? essayChatHistory : topicChatHistory;
+            
+            addMessage(containerId, response, 'assistant');
+            history.push({ role: 'assistant', content: response });
+            
+            if (currentMode === 'essay') {
+                updateEssayFile();
+            } else {
+                updateTopicFile();
+            }
+            
+            closeModal();
+        }
+        
+        // Build prompt for manual mode
+        function buildPrompt(systemPrompt, history, newMessage) {
+            let prompt = `=== SYSTEM PROMPT ===\n${systemPrompt}\n\n=== CONVERSATION ===\n`;
+            history.forEach(msg => {
+                prompt += `${msg.role.toUpperCase()}: ${msg.content}\n\n`;
+            });
+            prompt += `USER: ${newMessage}\n\n=== YOUR RESPONSE ===\n`;
+            return prompt;
+        }
+        
+        // Essay mode chat
+        async function sendEssayMessage() {
+            const input = document.getElementById('essayChatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addMessage('essayChatMessages', message, 'user');
+            essayChatHistory.push({ role: 'user', content: message });
+            input.value = '';
+            
+            // Show typing indicator
+            const typingId = showTypingIndicator('essayChatMessages');
+            
+            if (aiConnected) {
+                // Try to call AI
+                const response = await callAI(essayChatHistory, essaySystemPrompt);
+                removeTypingIndicator(typingId);
+                
+                if (response) {
+                    addMessage('essayChatMessages', response, 'assistant');
+                    essayChatHistory.push({ role: 'assistant', content: response });
+                    updateEssayFile();
+                } else {
+                    // Fallback to manual mode
+                    showModal(buildPrompt(essaySystemPrompt, essayChatHistory.slice(0, -1), message));
+                }
+            } else {
+                // Manual mode - show copy-paste modal
+                removeTypingIndicator(typingId);
+                showModal(buildPrompt(essaySystemPrompt, essayChatHistory.slice(0, -1), message));
+            }
+        }
+        
+        // Topic explorer chat
+        async function sendTopicMessage() {
+            const input = document.getElementById('topicChatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addMessage('topicChatMessages', message, 'user');
+            topicChatHistory.push({ role: 'user', content: message });
+            input.value = '';
+            
+            // Show typing indicator
+            const typingId = showTypingIndicator('topicChatMessages');
+            
+            if (aiConnected) {
+                const response = await callAI(topicChatHistory, topicSystemPrompt);
+                removeTypingIndicator(typingId);
+                
+                if (response) {
+                    addMessage('topicChatMessages', response, 'assistant');
+                    topicChatHistory.push({ role: 'assistant', content: response });
+                    updateTopicFile();
+                } else {
+                    showModal(buildPrompt(topicSystemPrompt, topicChatHistory.slice(0, -1), message));
+                }
+            } else {
+                removeTypingIndicator(typingId);
+                showModal(buildPrompt(topicSystemPrompt, topicChatHistory.slice(0, -1), message));
+            }
+        }
+        
+        // Typing indicator
+        function showTypingIndicator(containerId) {
+            const container = document.getElementById(containerId);
+            const id = 'typing-' + Date.now();
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = 'message assistant';
+            div.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="message-content" style="display:flex; gap:5px;">
+                    <span class="typing-dot" style="animation: bounce 1s infinite;">●</span>
+                    <span class="typing-dot" style="animation: bounce 1s infinite 0.2s;">●</span>
+                    <span class="typing-dot" style="animation: bounce 1s infinite 0.4s;">●</span>
+                </div>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+            return id;
+        }
+        
+        function removeTypingIndicator(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+        
+        // Simple markdown to HTML converter (fallback if marked.js not loaded)
+        function simpleMarkdown(text) {
+            return text
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+                .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+                .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+                .replace(/^- (.+)$/gm, '<li>$1</li>')
+                .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+                .replace(/\n/g, '<br>');
+        }
+        
+        // Render markdown content
+        function renderMarkdown(content) {
+            if (typeof marked !== 'undefined' && marked.parse) {
+                try {
+                    return marked.parse(content);
+                } catch(e) {
+                    console.log('Marked.js error, using fallback:', e);
+                    return simpleMarkdown(content);
+                }
+            }
+            return simpleMarkdown(content);
+        }
+        
+        // Add message to chat
+        function addMessage(containerId, content, role) {
+            const container = document.getElementById(containerId);
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            
+            const avatar = role === 'user' ? '👤' : (containerId === 'essayChatMessages' ? '🤖' : '🔍');
+            
+            // Render markdown for assistant messages
+            const renderedContent = role === 'assistant' ? renderMarkdown(content) : content;
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${avatar}</div>
+                <div class="message-content">${renderedContent}</div>
+            `;
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // Word count
+        document.getElementById('essayTextarea').addEventListener('input', function() {
+            const words = this.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+            document.getElementById('wordCount').textContent = `${words} / 200 words`;
+            
+            if (words >= 180 && words <= 220) {
+                document.getElementById('wordCount').style.background = 'rgba(0,255,0,0.3)';
+            } else if (words > 220) {
+                document.getElementById('wordCount').style.background = 'rgba(255,0,0,0.3)';
+            } else {
+                document.getElementById('wordCount').style.background = 'rgba(255,255,255,0.2)';
+            }
+        });
+        
+        // Save essay
+        function saveEssay() {
+            const essay = document.getElementById('essayTextarea').value;
+            const markdown = `# My Reflective Essay - GCAP3226\n\n${essay}\n\n---\n*Saved: ${new Date().toLocaleString()}*`;
+            
+            // Store for IDE access
+            document.getElementById('essay-markdown-content').textContent = markdown;
+            
+            // Download as file
+            downloadFile('essay1.md', markdown);
+            alert('Essay saved! The file has been downloaded.');
+        }
+        
+        // Copy essay
+        function copyEssay() {
+            const essay = document.getElementById('essayTextarea').value;
+            navigator.clipboard.writeText(essay);
+            alert('Essay copied to clipboard!');
+        }
+        
+        // Generate HTML for Moodle
+        function generateHTML() {
+            const essay = document.getElementById('essayTextarea').value;
+            const html = `<div style="font-family: Arial, sans-serif; line-height: 1.6; padding: 15px;">
+<p><strong>My Reflection on Regression and Simulation Models</strong></p>
+<p>${essay.replace(/\n/g, '</p><p>')}</p>
+</div>`;
+            
+            navigator.clipboard.writeText(html);
+            
+            // Also show in chat
+            addMessage('essayChatMessages', `📋 HTML code generated and copied to clipboard! Here it is:<br><br><code style="background: #f0f0f0; padding: 10px; display: block; white-space: pre-wrap; font-size: 0.8em;">${html.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>`, 'assistant');
+            essayChatHistory.push({ role: 'assistant', content: 'HTML code generated for Moodle posting.' });
+        }
+        
+        function generateHTMLCode() {
+            const essay = document.getElementById('essayTextarea').value || '[Your essay content here]';
+            return `Here's the HTML code for your Moodle forum post:<br><br><code style="background: #f0f0f0; padding: 10px; display: block; white-space: pre-wrap; font-size: 0.8em;">&lt;div style="font-family: Arial, sans-serif; line-height: 1.6; padding: 15px;"&gt;
+&lt;p&gt;&lt;strong&gt;My Reflection on Regression and Simulation Models&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;${essay.substring(0, 100)}...&lt;/p&gt;
+&lt;/div&gt;</code><br>Click the "Generate HTML for Moodle" button to get the complete code with your full essay.`;
+        }
+        
+        // Export chat history
+        function exportChat() {
+            let markdown = `# Essay Writing Chat History - GCAP3226\n\n`;
+            markdown += `*Exported: ${new Date().toLocaleString()}*\n\n---\n\n`;
+            
+            essayChatHistory.forEach(msg => {
+                const role = msg.role === 'user' ? '**You**' : '**Tutor**';
+                markdown += `${role}: ${msg.content.replace(/<[^>]*>/g, '')}\n\n`;
+            });
+            
+            downloadFile('essay_chat_history.md', markdown);
+        }
+        
+        function exportTopicChat() {
+            let markdown = `# Topic Exploration Chat History - GCAP3226\n\n`;
+            markdown += `*Exported: ${new Date().toLocaleString()}*\n\n---\n\n`;
+            
+            topicChatHistory.forEach(msg => {
+                const role = msg.role === 'user' ? '**You**' : '**Explorer**';
+                markdown += `${role}: ${msg.content.replace(/<[^>]*>/g, '')}\n\n`;
+            });
+            
+            const notes = document.getElementById('topicNotes').value;
+            if (notes) {
+                markdown += `\n---\n\n## My Notes\n\n${notes}`;
+            }
+            
+            downloadFile('exploreTopics.md', markdown);
+        }
+        
+        function saveTopicNotes() {
+            const notes = document.getElementById('topicNotes').value;
+            const markdown = `# Topic Exploration Notes - GCAP3226\n\n${notes}\n\n---\n*Saved: ${new Date().toLocaleString()}*`;
+            downloadFile('topic_notes.md', markdown);
+            alert('Notes saved!');
+        }
+        
+        // Update files in real-time (stores in localStorage for persistence)
+        function updateEssayFile() {
+            // Save as JSON for proper restore
+            localStorage.setItem('essayChatHistory', JSON.stringify(essayChatHistory));
+            
+            // Also maintain markdown version
+            let markdown = `# Essay Writing Chat History\n\n`;
+            essayChatHistory.forEach(msg => {
+                const role = msg.role === 'user' ? '**You**' : '**Tutor**';
+                markdown += `${role}: ${msg.content.replace(/<[^>]*>/g, '')}\n\n`;
+            });
+            localStorage.setItem('essayChatHistoryMd', markdown);
+        }
+        
+        function updateTopicFile() {
+            // Save as JSON for proper restore
+            localStorage.setItem('topicChatHistory', JSON.stringify(topicChatHistory));
+            
+            // Also maintain markdown version
+            let markdown = `# Topic Exploration Chat History\n\n`;
+            topicChatHistory.forEach(msg => {
+                const role = msg.role === 'user' ? '**You**' : '**Explorer**';
+                markdown += `${role}: ${msg.content.replace(/<[^>]*>/g, '')}\n\n`;
+            });
+            localStorage.setItem('topicChatHistoryMd', markdown);
+        }
+        
+        // Download file helper
+        function downloadFile(filename, content) {
+            const blob = new Blob([content], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Enter key support
+        document.getElementById('essayChatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendEssayMessage();
+        });
+        document.getElementById('topicChatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendTopicMessage();
+        });
+        
+        // Load saved data and check AI connections
+        window.onload = async function() {
+            // Check for AI connections
+            await checkAIConnections();
+            
+            // Load saved essay
+            const savedEssay = localStorage.getItem('essay1_content');
+            if (savedEssay) {
+                document.getElementById('essayTextarea').value = savedEssay;
+                document.getElementById('essayTextarea').dispatchEvent(new Event('input'));
+            }
+            
+            // Load saved chat histories
+            const savedEssayChat = localStorage.getItem('essayChatHistory');
+            const savedTopicChat = localStorage.getItem('topicChatHistory');
+            if (savedEssayChat) {
+                try {
+                    essayChatHistory = JSON.parse(savedEssayChat);
+                    essayChatHistory.forEach(msg => {
+                        addMessage('essayChatMessages', msg.content, msg.role);
+                    });
+                } catch(e) {}
+            }
+            if (savedTopicChat) {
+                try {
+                    topicChatHistory = JSON.parse(savedTopicChat);
+                    topicChatHistory.forEach(msg => {
+                        addMessage('topicChatMessages', msg.content, msg.role);
+                    });
+                } catch(e) {}
+            }
+        };
+        
+        // Auto-save essay content
+        document.getElementById('essayTextarea').addEventListener('input', function() {
+            localStorage.setItem('essay1_content', this.value);
+        });
+    </script>
+</body>
+</html>
