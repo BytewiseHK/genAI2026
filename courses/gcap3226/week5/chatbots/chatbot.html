@@ -457,10 +457,10 @@ Your essay should include:
                 <div class="instructions">
                     <h3>🔍 Topic Explorer Instructions</h3>
                     <ul>
-                        <li>Use this to explore different project topics</li>
-                        <li>Ask your IDE's AI agent to perform web searches</li>
+                        <li><strong>🌐 Web Search:</strong> Type a topic and click the globe button to search Wikipedia</li>
+                        <li><strong>➤ Ask AI:</strong> Click the arrow to discuss with AI</li>
                         <li>Chat history is saved to <code>exploreTopics.md</code></li>
-                        <li>Discuss ideas for your group project</li>
+                        <li>Search results include links to Google Scholar for academic sources</li>
                     </ul>
                 </div>
                 <div class="message assistant">
@@ -468,22 +468,24 @@ Your essay should include:
                     <div class="message-content">
                         Hello! I'm here to help you explore different topics for your group project.
                         <br><br>
-                        You can ask me to:
+                        <strong>Two ways to use me:</strong>
                         <ul style="margin-top: 10px; padding-left: 20px;">
-                            <li>Search for information about potential topics</li>
-                            <li>Compare different project ideas</li>
-                            <li>Find resources and references</li>
-                            <li>Discuss how topics relate to course concepts</li>
+                            <li><strong>🌐 Web Search</strong> - Search Wikipedia & get links to Google Scholar</li>
+                            <li><strong>➤ Ask AI</strong> - Discuss ideas with the AI assistant</li>
                         </ul>
                         <br>
+                        <strong>Tip:</strong> Search for a topic first, then ask the AI to help you understand the results!
+                        <br><br>
                         What topic would you like to explore?
                     </div>
                 </div>
             </div>
             <div class="chat-input-area">
                 <input type="text" class="chat-input" id="topicChatInput" placeholder="Enter a topic to explore or ask a question...">
+                <button class="search-btn" onclick="webSearch()" title="Search Wikipedia & Web" style="background: linear-gradient(135deg, #2196F3, #21CBF3); color: white; border: none; padding: 12px 15px; border-radius: 12px; cursor: pointer; font-size: 1.1em; margin-right: 5px;">🌐</button>
                 <button class="send-btn" onclick="sendTopicMessage()" style="background: linear-gradient(135deg, #fc4a1a, #f7b733);">➤</button>
             </div>
+            <div style="font-size: 0.75em; color: #888; text-align: center; margin-top: 5px;">🌐 = Web Search | ➤ = Ask AI</div>
         </div>
         
         <div class="essay-section" style="flex: 1;">
@@ -592,7 +594,112 @@ Keep responses concise (2-3 paragraphs max). Be encouraging and help the student
 3. Find relevant resources and references
 4. Think critically about project feasibility
 
-When students ask to search for something, provide helpful information and suggestions. Keep responses practical and actionable.`;
+When students share web search results with you, analyze and summarize the key points. Help them understand how the information relates to their project. Keep responses practical and actionable.`;
+
+        // ===== WEB SEARCH FUNCTIONS =====
+        
+        // Search Wikipedia API
+        async function searchWikipedia(query) {
+            try {
+                const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
+                const response = await fetch(url);
+                if (response.ok) {
+                    const data = await response.json();
+                    return {
+                        title: data.title,
+                        extract: data.extract,
+                        url: data.content_urls?.desktop?.page,
+                        thumbnail: data.thumbnail?.source
+                    };
+                }
+            } catch (e) {
+                console.log('Wikipedia search failed:', e);
+            }
+            return null;
+        }
+        
+        // Search Wikipedia for multiple results
+        async function searchWikipediaMultiple(query) {
+            try {
+                const url = `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=5&format=json&origin=*`;
+                const response = await fetch(url);
+                if (response.ok) {
+                    const data = await response.json();
+                    // data format: [query, [titles], [descriptions], [urls]]
+                    const results = [];
+                    for (let i = 0; i < data[1].length; i++) {
+                        results.push({
+                            title: data[1][i],
+                            description: data[2][i],
+                            url: data[3][i]
+                        });
+                    }
+                    return results;
+                }
+            } catch (e) {
+                console.log('Wikipedia multi-search failed:', e);
+            }
+            return [];
+        }
+        
+        // Web search function
+        async function webSearch() {
+            const input = document.getElementById('topicChatInput');
+            const query = input.value.trim();
+            if (!query) {
+                alert('Please enter a search query first.');
+                return;
+            }
+            
+            input.value = '';
+            
+            // Show user's search query
+            addMessage('topicChatMessages', `🔍 Searching: "${query}"`, 'user');
+            topicChatHistory.push({ role: 'user', content: `Search for: ${query}` });
+            
+            // Show searching indicator
+            const typingId = showTypingIndicator('topicChatMessages');
+            
+            // Search Wikipedia
+            const wikiResult = await searchWikipedia(query);
+            const wikiMultiple = await searchWikipediaMultiple(query);
+            
+            removeTypingIndicator(typingId);
+            
+            // Build search results message
+            let resultMessage = `## 🌐 Web Search Results for "${query}"\n\n`;
+            
+            if (wikiResult && wikiResult.extract) {
+                resultMessage += `### 📚 Wikipedia Summary\n\n`;
+                resultMessage += `**${wikiResult.title}**\n\n`;
+                resultMessage += `${wikiResult.extract}\n\n`;
+                resultMessage += `[Read more on Wikipedia](${wikiResult.url})\n\n`;
+            }
+            
+            if (wikiMultiple.length > 0) {
+                resultMessage += `### 📖 Related Topics\n\n`;
+                wikiMultiple.forEach(item => {
+                    resultMessage += `- **[${item.title}](${item.url})**: ${item.description || 'No description'}\n`;
+                });
+                resultMessage += `\n`;
+            }
+            
+            // Add links to external search engines
+            resultMessage += `### 🔗 Search More\n\n`;
+            resultMessage += `- [DuckDuckGo](https://duckduckgo.com/?q=${encodeURIComponent(query)})\n`;
+            resultMessage += `- [Google Scholar](https://scholar.google.com/scholar?q=${encodeURIComponent(query)})\n`;
+            resultMessage += `- [Google](https://www.google.com/search?q=${encodeURIComponent(query)})\n\n`;
+            
+            if (!wikiResult && wikiMultiple.length === 0) {
+                resultMessage += `*No Wikipedia results found. Try the search links above for more results.*\n`;
+            }
+            
+            resultMessage += `---\n*Click 🌐 again to search for something else, or ask the AI (➤) to help you understand these results.*`;
+            
+            addMessage('topicChatMessages', resultMessage, 'assistant');
+            topicChatHistory.push({ role: 'assistant', content: resultMessage });
+            updateTopicFile();
+        }
 
         // Check for available AI endpoints on load
         async function checkAIConnections() {
