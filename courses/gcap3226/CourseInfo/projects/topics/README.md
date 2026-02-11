@@ -38,6 +38,19 @@ Open the roadmap in your browser (click to expand steps and see AI vs human role
 
 ---
 
+## Reference past projects (Fall 2025)
+
+These topics have **past-project-fall2025.md** summaries from GCAP 3226 Fall 2025. They are **reference only** (not Spring 2026 group topics) but available for inspiration and adaptation.
+
+| Topic | Folder | Past project summary |
+|-------|--------|----------------------|
+| Solid Waste Charging | [solid-waste-charging/](solid-waste-charging/) | [past-project-fall2025.md](solid-waste-charging/past-project-fall2025.md) |
+| Typhoon Signal Analysis | [typhoon/](typhoon/) | [past-project-fall2025.md](typhoon/past-project-fall2025.md) |
+
+Full archive (Team folders, outlines, portal links): [MetaProject/past projects/](../../MetaProject/past%20projects/)
+
+---
+
 ## Publishing with GitHub Pages
 
 These HTML files are served from the **genAI2026** repo via GitHub Pages.
